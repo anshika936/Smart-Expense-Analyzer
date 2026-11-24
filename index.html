@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Expense Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-icon">◈</span><span>Spend<span class="brand-light">Wise</span><small>SMART EXPENSE ANALYZER</small></span></a>
+      <div class="side-label">WORKSPACE</div>
+      <nav id="navigation">
+        <button class="nav-item active" data-page="overview"><span>▦</span> Overview</button>
+        <button class="nav-item" data-page="transactions"><span>⇄</span> Transactions</button>
+        <button class="nav-item" data-page="budget"><span>◉</span> Budget & Savings</button>
+        <button class="nav-item" data-page="analysis"><span>▥</span> Analysis</button>
+        <button class="nav-item" data-page="history"><span>◷</span> Monthly History</button>
+        <button class="nav-item" data-page="sms"><span>▤</span> SMS Import</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="tip-card"><span class="tip-icon">✦</span><strong>Small steps matter</strong><p>Every rupee you track brings you closer to your goals.</p></div>
+        <div class="profile"><div class="avatar">U</div><div><strong>Your account</strong><small>Personal workspace</small></div><span class="dots">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><div class="eyebrow">PERSONAL FINANCE</div><h1 id="page-title">Overview</h1></div>
+        <div class="top-actions">
+          <label class="month-control"><span>MONTH</span><select id="month-select" aria-label="Select month"></select></label>
+          <button class="primary-btn" id="top-add">＋ Add transaction</button>
+        </div>
+      </header>
+
+      <section class="page active" id="page-overview">
+        <div class="welcome-row"><div><h2>Your money, in focus.</h2><p>Here's your financial snapshot for <strong id="month-label"></strong>.</p></div><span class="demo-pill"><i></i> DEMO WORKSPACE</span></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Total income</span><span class="stat-icon green">↙</span></div><strong id="total-income">₹0</strong><small class="muted">Money received this month</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Total expenses</span><span class="stat-icon coral">↗</span></div><strong id="total-expense">₹0</strong><small class="muted">Money spent this month</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Spending budget</span><span class="stat-icon blue">◉</span></div><strong id="spending-budget">₹0</strong><small class="muted">Your planned spending limit</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Savings remaining</span><span class="stat-icon purple">✧</span></div><strong id="savings-remaining">₹0</strong><small class="muted">After any budget overrun</small></article>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel budget-panel">
+            <div class="panel-heading"><div><h3>Monthly spending</h3><p>Track your spending against your budget</p></div><span class="soft-tag" id="budget-percent">0% used</span></div>
+            <div class="progress-track"><div class="progress-fill" id="budget-progress"></div></div>
+            <div class="progress-legend"><span><i class="dot dark"></i> Spent <b id="spent-label">₹0</b></span><span><i class="dot pale"></i> Budget <b id="budget-label">₹0</b></span></div>
+            <div class="alert-box" id="budget-alert"><span>✦</span><div><strong>You're on track</strong><p>Your spending is within your planned budget.</p></div></div>
+          </article>
+          <article class="panel prediction-panel">
+            <div class="panel-heading"><div><h3>Month-end prediction</h3><p>Based on your current spending pace</p></div><span class="prediction-icon">⌁</span></div>
+            <div class="prediction-number" id="predicted-expense">₹0</div>
+            <div class="prediction-caption">Estimated total expenses by month end</div>
+            <div class="prediction-note" id="prediction-note">An estimate, not a guaranteed outcome.</div>
+          </article>
+        </div>
+
+        <article class="panel transactions-panel">
+          <div class="panel-heading"><div><h3>Recent transactions</h3><p>Your latest income and expenses</p></div><button class="text-btn" data-goto="transactions">View all →</button></div>
+          <div class="table-wrap"><table><thead><tr><th>TRANSACTION</th><th>CATEGORY</th><th>DATE</th><th>AMOUNT</th></tr></thead><tbody id="recent-rows"></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="page" id="page-transactions">
+        <div class="section-intro"><div><h2>Transactions</h2><p>Add and manage your income and expenses.</p></div><button class="primary-btn" id="show-form">＋ New transaction</button></div>
+        <form class="panel transaction-form hidden" id="transaction-form">
+          <div class="panel-heading"><div><h3 id="form-heading">Add a transaction</h3><p>Enter the details below</p></div><button type="button" class="icon-btn" id="close-form">✕</button></div>
+          <input type="hidden" id="edit-id">
+          <div class="form-grid">
+            <label>Transaction title<input id="title-input" required placeholder="e.g. Grocery shopping"></label>
+            <label>Amount (₹)<input id="amount-input" type="number" min="0.01" step="0.01" required placeholder="e.g. 850"></label>
+            <label>Type<select id="type-input"><option value="expense">Expense</option><option value="income">Income</option></select></label>
+            <label>Category<select id="category-input"></select></label>
+            <label>Date<input id="date-input" type="date" required></label>
+            <label>Description (optional)<input id="description-input" placeholder="Add a note"></label>
+          </div>
+          <div class="form-actions"><button type="button" class="secondary-btn" id="cancel-form">Cancel</button><button class="primary-btn" type="submit">Save transaction</button></div>
+        </form>
+        <article class="panel">
+          <div class="panel-heading"><div><h3>All transactions</h3><p id="transaction-count">0 records</p></div><input class="search-input" id="search-input" placeholder="Search transactions…"></div>
+          <div class="table-wrap"><table><thead><tr><th>TRANSACTION</th><th>CATEGORY</th><th>DATE</th><th>TYPE</th><th>AMOUNT</th><th>ACTION</th></tr></thead><tbody id="all-rows"></tbody></table></div>
+          <div class="empty-state hidden" id="transaction-empty">No transactions found for this month. Add one to get started.</div>
+        </article>
+      </section>
+
+      <section class="page" id="page-budget">
+        <div class="section-intro"><div><h2>Budget & savings</h2><p>Choose how to divide this month's income.</p></div></div>
+        <div class="budget-layout">
+          <article class="panel allocation-panel">
+            <div class="panel-heading"><div><h3>Flexible allocation</h3><p>Your percentages can change every month.</p></div></div>
+            <div class="income-highlight"><span>Monthly income</span><strong id="allocation-income">₹0</strong></div>
+            <label class="range-label">Spending allocation <strong id="spend-percent">70%</strong></label>
+            <input type="range" min="0" max="100" step="5" id="spend-range" value="70">
+            <div class="range-ends"><span>0% spending</span><span>100% spending</span></div>
+            <div class="allocation-results"><div><span class="legend-square green-square"></span><span>Spending budget</span><strong id="allocation-spend">₹0</strong></div><div><span class="legend-square purple-square"></span><span>Savings allocation</span><strong id="allocation-save">₹0</strong></div></div>
+            <p class="helper-text">Spending and savings percentages always add up to 100%.</p>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><h3>Where you stand</h3><p>Based on this month's activity</p></div></div>
+            <div class="balance-list"><div><span>Actual expenses</span><strong id="actual-expenses">₹0</strong></div><div><span>Savings used</span><strong id="savings-used">₹0</strong></div><div><span>Remaining savings</span><strong id="remaining-savings-detail">₹0</strong></div><div class="balance-total"><span>Financial status</span><strong id="financial-status">On track</strong></div></div>
+            <p class="helper-text">If expenses exceed the spending budget, the extra amount is deducted from this month's savings allocation. Expenses above total income are shown as a shortfall.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="page" id="page-analysis">
+        <div class="section-intro"><div><h2>Spending analysis</h2><p>Understand where your money goes in <span id="analysis-month"></span>.</p></div></div>
+        <div class="charts-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Expenses by category</h3><p>Distribution of your spending</p></div></div><div class="chart-box"><canvas id="category-chart"></canvas></div></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Income vs expenses</h3><p>Monthly comparison</p></div></div><div class="chart-box"><canvas id="comparison-chart"></canvas></div></article>
+        </div>
+      </section>
+
+      <section class="page" id="page-history">
+        <div class="section-intro"><div><h2>Monthly history</h2><p>Each month has its own separate financial record.</p></div></div>
+        <article class="panel"><div class="panel-heading"><div><h3>Your financial timeline</h3><p>Select a month to open its dashboard.</p></div></div><div class="history-list" id="history-list"></div><p class="helper-text">Unused savings are not automatically carried forward into the next month.</p></article>
+      </section>
+
+      <section class="page" id="page-sms">
+        <div class="section-intro"><div><h2>SMS transaction import</h2><p>Try the transaction parser using a sample bank message.</p></div></div>
+        <article class="panel sms-panel">
+          <div class="sms-warning"><strong>Prototype limitation</strong><p>A normal browser-based website cannot directly read your phone's SMS inbox. This demo parses text that you paste manually.</p></div>
+          <label class="sms-label">Paste sample bank SMS<textarea id="sms-input" rows="5" placeholder="e.g. Rs. 450 debited from your account at ABC Store on 23-11-2026"></textarea></label>
+          <button class="primary-btn" id="parse-sms">✦ Parse SMS</button>
+          <div class="sms-result hidden" id="sms-result"></div>
+        </article>
+      </section>
+      <footer>SpendWise · Smart Expense Analyzer <span>Frontend concept demo · Sample data</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
